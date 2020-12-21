@@ -1,0 +1,16 @@
+class UsersController
+  class Job < Struct
+    attr_reader title: String
+    attr_reader grade: Integer
+
+    def initialize: (title: String, grade: Integer) -> void
+  end
+
+  class CreateRequest < Struct
+    attr_reader name: String
+    attr_reader age: Integer
+    attr_reader job: Job
+
+    def initialize: (name: String, age: Integer, job: Job) -> void
+  end
+end
