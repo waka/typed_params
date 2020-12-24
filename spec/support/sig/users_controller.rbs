@@ -1,12 +1,12 @@
 class UsersController
-  class Job < Struct
+  class Job < Struct[String | Integer]
     attr_reader title: String
     attr_reader grade: Integer
 
     def initialize: (title: String, grade: Integer) -> void
   end
 
-  class CreateRequest < Struct
+  class CreateRequest < Struct[String | Integer | Job]
     attr_reader name: String
     attr_reader age: Integer
     attr_reader job: Job

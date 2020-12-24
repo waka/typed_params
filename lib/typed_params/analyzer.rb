@@ -2,42 +2,44 @@ require "action_controller"
 
 module TypedParams
   class Analyzer
-    def self.check_type(parameters, type)
-      struct = 
-        case parameters
-        when ActionController::Parameters
-          struct_from_params(parameters)
-        when Hash, ActiveSupport::HashWithIndifferentAccess
-          struct_from_hash(parameters)
-        else
-          nil
-        end
-      return parameters if struct.nil?
+    def self.diff(parameters, type)
+      hash = hash_from_params(parameters)
+      return parameters if hash.nil?
 
-      same_structure?(
-        Environment.structure_from_struct(struct),
-        Environment.structure_from_type(type)
-      )
+      namespace = create_namespace(type)
+      typings = TypedParams::Environment.typings_from_namespace(namespace)
+
+      type_diff(hash, typings)
     end
 
-    # @param [ActionController::Parameters] parameters
-    def self.struct_from_params(parameters)
-      struct_from_hash(parameters.to_unsafe_hash.deep_symbolize_keys)
+    def self.create_namespace(type)
+      parts = type.to_s.split('::').map(&:to_sym)
+      { name: parts[-1], paths: parts[0...-1] }
     end
 
-    # @param [Hash | ActiveSupport::HashWithIndifferentAccess] hash
-    def self.struct_from_hash(hash)
-      values = hash.values.map do |v|
-        case v
-        when Hash, ActiveSupport::HashWithIndifferentAccess
-          struct_from_hash(v)
-        when Array
-          v.map {|x| struct_from_hash(x) }
-        else
-          v
-        end
+    def self.hash_from_params(parameters)
+      case parameters
+      when ActionController::Parameters
+        parameters.to_unsafe_hash.deep_symbolize_keys
+      when Hash, ActiveSupport::HashWithIndifferentAccess
+        parameters.deep_symbolize_keys
+      else
+        nil
       end
-      Struct.new(*hash.keys).new(*values)
+    end
+
+    def self.type_diff(hash, typings)
+      diff = hash.map { |k, v|
+        typing = typings[k]
+        if v.class == Hash
+          [k, type_diff(v, typing)]
+        elsif v.class.name.to_sym == typing
+          [k, nil]
+        else
+          [k, "Invalid type: expected=#{typing}, actual=#{v.class.name.to_sym}"]
+        end
+      }.to_h.compact
+      diff.empty? ? nil : diff
     end
   end
 end
