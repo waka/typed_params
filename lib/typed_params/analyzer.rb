@@ -2,18 +2,18 @@ require "action_controller"
 
 module TypedParams
   class Analyzer
-    def self.diff(parameters, type)
+    def self.diff(parameters, class_name)
       hash = hash_from_params(parameters)
       return parameters if hash.nil?
 
-      namespace = create_namespace(type)
+      namespace = create_namespace(class_name)
       typings = TypedParams::Environment.typings_from_namespace(namespace)
 
       type_diff(hash, typings)
     end
 
-    def self.create_namespace(type)
-      parts = type.to_s.split('::').map(&:to_sym)
+    def self.create_namespace(class_name)
+      parts = class_name.to_s.split('::').map(&:to_sym)
       { name: parts[-1], paths: parts[0...-1] }
     end
 

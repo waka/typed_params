@@ -1,9 +1,8 @@
 class TypedParams::Config
-  attr_accessor :sig_path, :strict
+  attr_accessor :sig_path
 
   def initialize
     @sig_path = nil
-    @strict = true
   end
 
   def sig_path=(path)

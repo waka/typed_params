@@ -5,8 +5,8 @@ require 'typed_params/environment'
 module TypedParams
   class InvalidTypeError < StandardError; end
 
-  def typed_params(parameters, type)
-    diff = TypedParams::Analyzer.diff(parameters, type)
+  def typed_params(parameters, class_name)
+    diff = TypedParams::Analyzer.diff(parameters, class_name)
     return parameters if diff.nil?
     raise TypedParams::InvalidTypeError.new(diff.inspect)
   end

@@ -27,7 +27,7 @@ module TypedParams
       definition_builder.build_instance(named_type)
     end
 
-    def self.type_name(name, paths = [])
+    def self.type_name(name, paths)
       RBS::TypeName.new(
         name: name,
         namespace: RBS::Namespace.new(absolute: true, path: paths)
@@ -40,9 +40,9 @@ module TypedParams
       @builder = RBS::DefinitionBuilder.new(env: rbs_env)
     end
 
-    def self.load_rbs_env(sig_path = TypedParams.config.sig_path)
+    def self.load_rbs_env
       loader = RBS::EnvironmentLoader.new
-      loader.add(path: sig_path)
+      loader.add(path: TypedParams.config.sig_path)
       RBS::Environment.from_loader(loader).resolve_type_names
     end
   end

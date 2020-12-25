@@ -1,0 +1,53 @@
+module TypedParams
+  VERSION: String
+
+  class InvalidTypeError < StandardError
+  end
+
+  type params = Hash[Symbol | String, untyped]
+
+  def typed_params: (params parameters, String class_name) -> untyped
+
+  def self.configure: () { (config: TypedParams::Config) -> void } -> void
+
+  def self.config: () -> TypedParams::Config
+end
+
+class TypedParams::Config
+  # @dynamic sig_path
+  attr_accessor sig_path: Pathname?
+
+  def initialize: () -> void
+
+  def sig_path=: (path: String | Pathname) -> void
+end
+
+module TypedParams
+  class Analyzer
+    type namespace = { name: Symbol, paths: Array[Symbol] | nil }
+
+    def self.diff: (untyped parameters, String class_name) -> Hash[Symbol, untyped]?
+
+    def self.create_namespace: (String class_name) -> namespace
+
+    def self.hash_from_params: (untyped parameters) -> Hash[Symbol, untyped]
+
+    def self.type_diff: (Hash[Symbol, untyped] hash, Hash[Symbol, untyped] typings) -> Hash[Symbol, untyped]?
+  end
+end
+
+module TypedParams
+  class Environment
+    type namespace = { name: Symbol, paths: Array[Symbol] | nil }
+
+    def self.typings_from_namespace: (namespace namespace) -> Hash[Symbol, untyped]
+
+    def self.definition_instance: (untyped namespace) -> untyped
+
+    def self.type_name: (String name, Array[String] paths) -> untyped
+
+    def self.definition_builder: () -> untyped
+
+    def self.load_rbs_env: () -> untyped
+  end
+end
