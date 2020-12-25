@@ -35,10 +35,18 @@ module TypedParams
           [k, type_diff(v, typing)]
         elsif v.class.name.to_sym == typing
           [k, nil]
+        elsif typing.nil?
+          [k, "Invalid type: #{k} is not found in rbs file."]
         else
-          [k, "Invalid type: expected=#{typing}, actual=#{v.class.name.to_sym}"]
+          [k, "Invalid type: #{k} expected=#{typing}, actual=#{v.class.name.to_sym}"]
         end
       }.to_h.compact
+
+      deletions = (typings.keys - hash.keys).map { |k|
+        [k, "Invalid type: #{k} is not found in parameters"]
+      }.to_h
+      diff.merge!(deletions) unless deletions.empty?
+
       diff.empty? ? nil : diff
     end
   end

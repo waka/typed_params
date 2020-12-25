@@ -6,11 +6,12 @@ class UsersController
     def initialize: (title: String, grade: Integer) -> void
   end
 
-  class CreateRequest < Struct[String | Integer | Job]
+  class CreateRequest < Struct[String | Integer | Job | Array[String]]
     attr_reader name: String
     attr_reader age: Integer
     attr_reader job: Job
+    attr_reader skill: Array[String]
 
-    def initialize: (name: String, age: Integer, job: Job) -> void
+    def initialize: (name: String, age: Integer, job: Job, skill: Array[String]) -> void
   end
 end

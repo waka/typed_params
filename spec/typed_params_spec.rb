@@ -6,12 +6,18 @@ RSpec.describe TypedParams do
   end
 
   let(:valid_hash) do
-    { name: 'bob', age: 20, job: { title: 'senior engineer', grade: 5 } }
+    { name: 'bob', age: 20, job: { title: 'senior engineer', grade: 5 }, skill: ['a', 'b'] }
   end
-  let(:invalid_hash) do
-    { name: 'bob', age: 20, job: { title: 'senior engineer', grade: 'abc' } }
+  let(:invalid_hash_1) do
+    { name: 'bob', age: 20, job: { title: 'senior engineer', grade: 'abc' }, skill: ['a', 'b'] }
   end
-  let(:type) { :'UsersController::CreateRequest' }
+  let(:invalid_hash_2) do
+    { name: 'bob', age: 20, job: { title: 'senior engineer', grade: 5 }, skill: ['a', 'b'], added: 'ng' }
+  end
+  let(:invalid_hash_3) do
+    { name: 'bob', job: { title: 'senior engineer', grade: 5 }, skill: ['a', 'b'] }
+  end
+  let(:type) { 'UsersController::CreateRequest' }
 
   subject { Test.new.typed_params(parameters, type) }
 
@@ -25,7 +31,7 @@ RSpec.describe TypedParams do
     end
     
     context 'invalid typed params' do
-      let(:parameters) { ActionController::Parameters.new(invalid_hash) }
+      let(:parameters) { ActionController::Parameters.new(invalid_hash_1) }
 
       it do
         expect { subject }.to raise_error(TypedParams::InvalidTypeError)
@@ -43,7 +49,25 @@ RSpec.describe TypedParams do
     end
     
     context 'invalid typed params' do
-      let(:parameters) { invalid_hash }
+      let(:parameters) { invalid_hash_1 }
+
+      it do
+        expect { subject }.to raise_error(TypedParams::InvalidTypeError)
+      end
+    end
+  end
+
+  describe 'Other invalid typed params' do
+    context 'has added params' do
+      let(:parameters) { invalid_hash_2 }
+
+      it do
+        expect { subject }.to raise_error(TypedParams::InvalidTypeError)
+      end
+    end
+
+    context 'has deleted params' do
+      let(:parameters) { invalid_hash_3 }
 
       it do
         expect { subject }.to raise_error(TypedParams::InvalidTypeError)
